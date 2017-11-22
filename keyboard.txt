@@ -1,0 +1,129 @@
+import RPi.GPIO as GPIO
+import sys
+import termios
+import tty
+import time
+
+#Leftmotor
+ain1 = 16
+ain2 = 20
+pwma = 21
+
+#Rightmotor
+bin1 = 26
+bin2 = 19
+pwmb = 13
+
+# GPIO general setup
+
+GPIO.setwarnings(False)
+GPIO.setmode(GPIO.BCM)
+
+# GPIOLeft
+GPIO.setup(ain1, GPIO.OUT)
+GPIO.setup(ain2, GPIO.OUT)
+GPIO.setup(pwma, GPIO.OUT)
+leftmotor = GPIO.PWM(pwma, 50)
+
+# GPIORight
+GPIO.setup(bin1, GPIO.OUT)
+GPIO.setup(bin2, GPIO.OUT)
+GPIO.setup(pwmb, GPIO.OUT)
+rightmotor = GPIO.PWM(pwmb, 50)
+
+
+def fwdcycle():
+
+	GPIO.output(ain1, GPIO.LOW)
+	GPIO.output(ain2, GPIO.HIGH)
+	GPIO.output(bin1, GPIO.HIGH)
+	GPIO.output(bin2, GPIO.LOW)
+	leftmotor.start(0)
+	rightmotor.start(0)
+	leftmotor.ChangeDutyCycle(100)
+	rightmotor.ChangeDutyCycle(100)
+
+
+def backward():
+
+	GPIO.output(ain1, GPIO.HIGH)
+	GPIO.output(ain2, GPIO.LOW)
+	GPIO.output(bin1, GPIO.LOW)
+	GPIO.output(bin2, GPIO.HIGH)
+	leftmotor.start(0)
+	rightmotor.start(0)
+	leftmotor.ChangeDutyCycle(70)
+	rightmotor.ChangeDutyCycle(70)
+
+
+def WA():
+
+	GPIO.output(ain1, GPIO.LOW)
+	GPIO.output(ain2, GPIO.HIGH)
+	GPIO.output(bin1, GPIO.HIGH)
+	GPIO.output(bin2, GPIO.LOW)
+	leftmotor.start(0)
+	rightmotor.start(0)
+	leftmotor.ChangeDutyCycle(25)
+ 	rightmotor.ChangeDutyCycle(75)
+
+
+def left():
+   	GPIO.output(ain1, GPIO.HIGH)
+   	GPIO.output(ain2, GPIO.LOW)
+   	GPIO.output(bin1, GPIO.HIGH)
+   	GPIO.output(bin2, GPIO.LOW)
+   	leftmotor.start(0)
+    	rightmotor.start(0)
+   	leftmotor.ChangeDutyCycle(30)
+   	rightmotor.ChangeDutyCycle(30)
+
+
+def right():
+   	GPIO.output(ain1, GPIO.LOW)
+   	GPIO.output(ain2, GPIO.HIGH)
+   	GPIO.output(bin1, GPIO.LOW)
+   	GPIO.output(bin2, GPIO.HIGH)
+   	leftmotor.start(0)
+  	rightmotor.start(0)
+ 	leftmotor.ChangeDutyCycle(30)
+   	rightmotor.ChangeDutyCycle(30)
+
+
+def stop():
+   	rightmotor.stop(0)
+   	leftmotor.stop(0)
+
+
+def getch():
+    fd = sys.stdin.fileno()
+    old_settings = termios.tcgetattr(fd)
+    try:
+        tty.setraw(sys.stdin.fileno())
+        ch = sys.stdin.read(1)
+    finally:
+        termios.tcsetattr(fd, termios.TCSADRAIN, old_settings)
+    return ch
+
+
+def main():
+	direction = ''
+	while direction != "\x03":
+		direction = getch()
+		if direction == 'w':
+			fwdcycle()
+        	elif direction == 's':
+			backward()
+        	elif direction == 'a':
+                	left()
+        	elif direction == 'd':
+			right()
+        	elif direction == 'x':
+			stop()
+
+        	else:
+            		print('INVALID:', direction)
+    	stop()
+
+
+main()

@@ -1,0 +1,128 @@
+import RPi.GPIO as GPIO 
+import time
+ 
+ain1 = 16 
+ain2 = 20 
+pwma = 21
+bin1 = 26 
+bin2 = 19 
+pwmb = 13 
+IRsensorL = 4 
+IRsensorM = 17 
+IRsensorR = 27 
+
+GPIO.setwarnings(True) 
+GPIO.setmode(GPIO.BCM)
+
+#leftmotor
+GPIO.setup(ain1, GPIO.OUT) 
+GPIO.setup(ain2, GPIO.OUT) 
+GPIO.setup(pwma, GPIO.OUT) 
+leftmotor = GPIO.PWM(pwma, 50)
+#rightmotor
+GPIO.setup(bin1, GPIO.OUT) 
+GPIO.setup(bin2, GPIO.OUT) 
+GPIO.setup(pwmb, GPIO.OUT) 
+rightmotor = GPIO.PWM(pwmb, 50)
+#sensor
+GPIO.setup(IRsensorL, GPIO.IN)
+GPIO.setup(IRsensorM, GPIO.IN) 
+GPIO.setup(IRsensorR, GPIO.IN) 
+
+
+def Forward():
+	GPIO.output(ain1, GPIO.LOW)
+	GPIO.output(bin2, GPIO.HIGH)
+	GPIO.output(bin1, GPIO.HIGH)
+	GPIO.output(bin2, GPIO.LOW)
+	leftmotor.start(0)
+	rightmotor.start(0)
+	leftmotor.ChangeDutyCycle(75)
+	rightmotor.ChangeDutyCycle(75) 
+
+
+def Stop():
+	rightmotor.stop(0)
+	leftmotor.stop(0) 
+
+
+def Backward():
+	GPIO.output(ain1, GPIO.HIGH)
+	GPIO.output(ain2, GPIO.LOW)
+	GPIO.output(bin1, GPIO.LOW)
+	GPIO.output(bin2, GPIO.HIGH)
+	rightmotor.start(0)
+	leftmotor.start(0)
+	leftmotor.ChangeDutyCycle(30)
+	rightmotor.ChangeDutyCycle(30) 
+
+
+def Left():
+	GPIO.output(ain1, GPIO.HIGH)
+	GPIO.output(ain2, GPIO.LOW)
+	GPIO.output(bin1, GPIO.HIGH)
+	GPIO.output(bin2, GPIO.LOW)
+	leftmotor.start(0)
+	rightmotor.start(0)
+	leftmotor.ChangeDutyCycle(15)
+	rightmotor.ChangeDutyCycle(30) 
+
+
+def SLeft():
+	GPIO.output(ain1, GPIO.HIGH)
+	GPIO.output(ain2, GPIO.LOW)
+	GPIO.output(bin1, GPIO.HIGH)
+	GPIO.output(bin2, GPIO.LOW)
+	leftmotor.start(0)
+	rightmotor.start(0)
+	leftmotor.ChangeDutyCycle(15)
+	rightmotor.ChangeDutyCycle(20) 
+
+def Right():
+	GPIO.output(ain1, GPIO.LOW)
+	GPIO.output(ain2, GPIO.HIGH)
+	GPIO.output(bin1, GPIO.LOW)
+	GPIO.output(bin2, GPIO.HIGH)
+	leftmotor.start(0)
+	rightmotor.start(0)
+	leftmotor.ChangeDutyCycle(30)
+	rightmotor.ChangeDutyCycle(15) 
+
+
+def SRight():
+	GPIO.output(ain1, GPIO.LOW)
+	GPIO.output(ain2, GPIO.HIGH)
+	GPIO.output(bin1, GPIO.LOW)
+	GPIO.output(bin2, GPIO.HIGH)
+	leftmotor.start(0)
+	rightmotor.start(0)
+	leftmotor.ChangeDutyCycle(20)
+	rightmotor.ChangeDutyCycle(15) 
+
+
+while True:
+	sensL = GPIO.input(IRsensorL)
+	sensM = GPIO.input(IRsensorM)
+	sensR = GPIO.input(IRsensorR)
+	
+	if sensL == 0 and sensM == 0 and sensR == 0:
+		Backward()
+		print("0,0,0")
+	elif sensL == 0 and sensM == 0 and sensR == 1:
+		Right()
+		print("0,0,1")
+	elif sensL==0 and sensM == 1 and sensR == 1:
+		SRight()
+		print("0,1,1")
+	elif sensL == 0 and sensM == 1 and sensR == 0:
+		Forward()
+		print("0,1,0")
+	elif sensL == 1 and sensM == 0 and sensR == 0:
+		Left()
+		print("1,0,0")
+	elif sensL == 1 and sensM == 1 and sensR ==0:
+		SLeft()
+		print("1,1,0")
+	elif sensL == 1 and sensM == 1 and sensR == 1:
+		Forward()
+		print("1,1,1")
